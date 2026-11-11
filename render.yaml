@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: scholarship-rag-agent-ma-xinye
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.demo
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: LLM_API_BASE_URL
+        value: https://dashscope.aliyuncs.com/compatible-mode/v1
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_CHAT_MODEL
+        value: qwen-plus
+      - key: EMBEDDING_API_BASE_URL
+        value: https://dashscope.aliyuncs.com/compatible-mode/v1
+      - key: EMBEDDING_MODEL
+        value: text-embedding-v4
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:////tmp/scholarship-demo.db
+      - key: AGENT_CHECKPOINT_DB
+        value: /tmp/agent-checkpoints.db
+      - key: GENERATED_REPORTS_DIR
+        value: /tmp/generated-reports
+      - key: FRONTEND_ORIGIN
+        value: https://scholarship-rag-agent-ma-xinye.onrender.com
+      - key: POLICY_DATA_DIR
+        value: ./data/policies
+      - key: POLICY_SEARCH_INDEX
+        value: ./data/policy_search_index.json
+      - key: AGENT_MAX_STEPS
+        value: "12"

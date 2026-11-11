@@ -1,0 +1,26 @@
+# 根目录 .dockerignore —— 后端镜像构建上下文过滤
+# （docker compose build backend 的 context 为项目根）
+.venv
+.idea
+.git
+__pycache__
+*.pyc
+*.pyo
+
+# 数据与运行时产物：容器通过 bind mount 使用宿主目录，无需打包进镜像
+app.db
+chroma_db
+data
+logs
+政策文件
+课设文档
+
+# 前端依赖/构建产物由前端自己的 context 处理
+frontend/node_modules
+frontend/dist
+
+# 环境与临时文件
+.env
+.env.local
+*.log
+.DS_Store

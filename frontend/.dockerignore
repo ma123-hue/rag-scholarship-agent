@@ -1,0 +1,6 @@
+# 前端镜像构建上下文过滤
+node_modules
+dist
+.git
+*.log
+.DS_Store

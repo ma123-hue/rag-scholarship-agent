@@ -1,0 +1,54 @@
+# 高校奖助学金申请条件评估与指导系统 —— Docker Compose 编排
+# 使用方式（项目根目录执行）：
+#   docker compose up -d --build
+#   docker compose ps
+#   docker compose logs -f backend
+#
+# 服务拓扑：
+#   frontend(nginx:5173) -> backend(FastAPI:8000) -> 线上 OpenAI 兼容 API
+# 数据持久化：app.db / agent checkpoints / reports / chroma_db / data/policies / logs 与宿主目录共享，
+#   容器重建后数据不丢失。
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: scholarship-backend:latest
+    container_name: scholarship-backend
+    env_file:
+      - .env
+    environment:
+      # 前端经 nginx 同源代理，保持原 CORS 白名单
+      - FRONTEND_ORIGIN=http://localhost:5173
+      - AGENT_CHECKPOINT_DB=/app/runtime/agent_checkpoints.db
+      - GENERATED_REPORTS_DIR=/app/generated_reports
+    volumes:
+      # 与宿主共享数据，零迁移、零丢失
+      - ./app.db:/app/app.db
+      - ./chroma_db:/app/chroma_db
+      - ./data/policies:/app/data/policies
+      - ./logs:/app/logs
+      - ./runtime:/app/runtime
+      - ./generated_reports:/app/generated_reports
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: scholarship-frontend:latest
+    container_name: scholarship-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
