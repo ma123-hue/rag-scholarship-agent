@@ -8,10 +8,12 @@ import { deletePolicyFile, fetchPolicyFiles, rebuildKnowledgeBase, uploadPolicyF
 import { formatApiDate } from '../utils/time'
 
 const router = useRouter()
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 const files = ref([])
 const loading = ref(false)
 const rebuilding = ref(false)
 const uploading = ref(false)
+const lastBuild = ref(null)
 
 function formatSize(size) {
   if (size < 1024) {
@@ -77,6 +79,7 @@ async function handleRebuild() {
   rebuilding.value = true
   try {
     const { data } = await rebuildKnowledgeBase()
+    lastBuild.value = data
     ElMessage.success(`知识库重建完成：${data.document_count} 个文档，${data.chunk_count} 个切片`)
   } catch (error) {
     ElMessage.error(error.response?.data?.detail || error.message || '重建失败')
@@ -125,6 +128,32 @@ onMounted(() => {
           </el-button>
         </div>
       </header>
+
+      <div v-if="demoMode" class="admin-demo-notice">
+        <div>
+          <strong>管理端产品演示模式</strong>
+          <p>上传、删除和重建均在当前浏览器中模拟，不会上传文件，也不会修改线上真实知识库。</p>
+        </div>
+        <el-tag type="warning" effect="dark">LOCAL DEMO</el-tag>
+      </div>
+
+      <section v-if="demoMode" class="admin-metrics">
+        <article>
+          <span>政策文件</span>
+          <strong>{{ files.length }}</strong>
+          <small>PDF / DOCX / TXT</small>
+        </article>
+        <article>
+          <span>处理流程</span>
+          <strong>4</strong>
+          <small>解析 · 清洗 · 切片 · 索引</small>
+        </article>
+        <article>
+          <span>最近重建</span>
+          <strong>{{ lastBuild ? `${lastBuild.chunk_count} 切片` : '待执行' }}</strong>
+          <small>{{ lastBuild ? '本次模拟任务已完成' : '点击“重建知识库”体验' }}</small>
+        </article>
+      </section>
 
       <section class="admin-card">
         <div class="admin-card-head">

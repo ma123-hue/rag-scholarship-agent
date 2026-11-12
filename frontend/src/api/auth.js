@@ -12,3 +12,7 @@ export function register(payload) {
   if (demoMode) return demoAuth(payload.username)
   return http.post('/auth/register', payload)
 }
+
+export function loginAsDemoAdmin() {
+  return demoAuth('演示管理员', true)
+}

@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { login, register } from '../api/auth'
+import { login, loginAsDemoAdmin, register } from '../api/auth'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
@@ -56,6 +56,18 @@ async function enterDemo() {
   loginForm.password = 'demo-only'
   await handleLogin()
 }
+
+async function enterAdminDemo() {
+  loading.value = true
+  try {
+    const { data } = await loginAsDemoAdmin()
+    authStore.setAuth(data.access_token, data.username, data.is_admin)
+    ElMessage.success('已进入管理端产品演示')
+    await router.push('/admin/files')
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -81,9 +93,14 @@ async function enterDemo() {
         <span>真实政策规则在浏览器本地计算，不调用模型、不上传数据。</span>
       </div>
 
-      <el-button v-if="demoMode" class="demo-entry" type="primary" round @click="enterDemo">
-        一键进入演示
-      </el-button>
+      <div v-if="demoMode" class="demo-entry-group">
+        <el-button class="demo-entry" type="primary" round :loading="loading" @click="enterDemo">
+          体验用户端
+        </el-button>
+        <el-button class="demo-entry" type="success" plain round :loading="loading" @click="enterAdminDemo">
+          体验管理端
+        </el-button>
+      </div>
 
       <div v-if="demoMode" class="demo-divider"><span>或体验账户流程</span></div>
 

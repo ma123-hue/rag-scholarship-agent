@@ -2,6 +2,7 @@ import { buildRuleTrace, evaluateMessage } from '../demo/ruleEngine'
 
 // 规则引擎版使用独立存储，避免旧版预设答案继续出现在历史会话中。
 const STORAGE_KEY = 'scholar_demo_state_v2'
+const ADMIN_STORAGE_KEY = 'scholar_admin_demo_state_v1'
 
 const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
@@ -33,14 +34,77 @@ async function emitTokens(text, onEvent) {
   }
 }
 
-export function demoAuth(username = '体验用户') {
+export function demoAuth(username = '体验用户', isAdmin = false) {
   return Promise.resolve({
     data: {
       access_token: 'demo-local-token',
       username: username.trim() || '体验用户',
-      is_admin: false,
+      is_admin: isAdmin,
     },
   })
+}
+
+function defaultAdminState() {
+  return {
+    files: [
+      { id: 1, original_filename: '太原理工大学本科生国家奖助学金管理办法.pdf', file_type: 'pdf', size_bytes: 1843200, uploaded_by: '系统管理员', created_at: '2026-09-01T08:30:00+08:00' },
+      { id: 2, original_filename: '软件学院优秀学生奖学金评定实施办法.pdf', file_type: 'pdf', size_bytes: 962560, uploaded_by: '系统管理员', created_at: '2026-09-03T10:15:00+08:00' },
+      { id: 3, original_filename: '家庭经济困难学生认定工作说明.docx', file_type: 'docx', size_bytes: 286720, uploaded_by: '政策运营', created_at: '2026-09-08T14:20:00+08:00' },
+    ],
+    lastRebuild: null,
+  }
+}
+
+function loadAdminState() {
+  try {
+    return JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY)) || defaultAdminState()
+  } catch {
+    return defaultAdminState()
+  }
+}
+
+function saveAdminState(state) {
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(state))
+}
+
+export async function demoFetchPolicyFiles() {
+  await sleep(220)
+  return { data: loadAdminState().files }
+}
+
+export async function demoUploadPolicyFile(file) {
+  await sleep(500)
+  const state = loadAdminState()
+  const extension = file.name.split('.').pop()?.toLowerCase() || 'txt'
+  const created = {
+    id: Date.now(),
+    original_filename: file.name,
+    file_type: extension,
+    size_bytes: file.size,
+    uploaded_by: '演示管理员',
+    created_at: new Date().toISOString(),
+  }
+  state.files.unshift(created)
+  saveAdminState(state)
+  return { data: created }
+}
+
+export async function demoDeletePolicyFile(fileId) {
+  await sleep(320)
+  const state = loadAdminState()
+  state.files = state.files.filter((item) => item.id !== fileId)
+  saveAdminState(state)
+  return { data: { ok: true } }
+}
+
+export async function demoRebuildKnowledgeBase() {
+  await sleep(1100)
+  const state = loadAdminState()
+  const documentCount = state.files.length
+  const chunkCount = state.files.reduce((total, file) => total + Math.max(8, Math.round(file.size_bytes / 7200)), 0)
+  state.lastRebuild = new Date().toISOString()
+  saveAdminState(state)
+  return { data: { document_count: documentCount, chunk_count: chunkCount, completed_at: state.lastRebuild } }
 }
 
 export function demoFetchSessions() {
