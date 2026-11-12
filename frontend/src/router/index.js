@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 
 import AuthView from '../views/AuthView.vue'
 import AdminFilesView from '../views/AdminFilesView.vue'
 import ChatView from '../views/ChatView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: import.meta.env.VITE_DEMO_MODE === 'true' ? createWebHashHistory() : createWebHistory(),
   routes: [
     {
       path: '/login',

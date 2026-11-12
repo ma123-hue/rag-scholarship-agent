@@ -22,8 +22,9 @@ function wait(ms) {
   })
 }
 
-const TYPEWRITER_CHARS_PER_TICK = 1
-const TYPEWRITER_DELAY_MS = 18
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
+const TYPEWRITER_CHARS_PER_TICK = DEMO_MODE ? 5 : 1
+const TYPEWRITER_DELAY_MS = DEMO_MODE ? 8 : 18
 
 
 export const useChatStore = defineStore('chat', {

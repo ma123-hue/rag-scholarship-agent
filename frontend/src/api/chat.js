@@ -1,6 +1,21 @@
 import http from './http'
+import {
+  demoExport,
+  demoFetchMessages,
+  demoFetchSessions,
+  demoPendingApproval,
+  demoRemoveSession,
+  demoResumeChat,
+  demoStreamChat,
+} from './demo'
+
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 export async function exportDocx(content, token) {
+  if (demoMode) {
+    demoExport(content)
+    return
+  }
   const response = await fetch('/api/chat/export-docx', {
     method: 'POST',
     headers: {
@@ -33,18 +48,22 @@ export async function exportDocx(content, token) {
 }
 
 export function fetchSessions() {
+  if (demoMode) return demoFetchSessions()
   return http.get('/sessions')
 }
 
 export function fetchSessionMessages(sessionId) {
+  if (demoMode) return demoFetchMessages(sessionId)
   return http.get(`/sessions/${sessionId}/messages`)
 }
 
 export function removeSession(sessionId) {
+  if (demoMode) return demoRemoveSession(sessionId)
   return http.delete(`/sessions/${sessionId}`)
 }
 
 export function fetchPendingApproval(sessionId) {
+  if (demoMode) return demoPendingApproval(sessionId)
   return http.get(`/chat/${sessionId}/pending-approval`)
 }
 
@@ -67,6 +86,7 @@ async function consumeSseBuffer(buffer, onEvent) {
 }
 
 export async function streamChat({ token, sessionId, message, onEvent }) {
+  if (demoMode) return demoStreamChat({ sessionId, message, onEvent })
   const response = await fetch('/api/chat/stream', {
     method: 'POST',
     headers: {
@@ -118,6 +138,7 @@ export async function streamChat({ token, sessionId, message, onEvent }) {
 }
 
 export async function resumeChat({ token, sessionId, decisions, onEvent }) {
+  if (demoMode) return demoResumeChat({ sessionId, decisions, onEvent })
   const response = await fetch(`/api/chat/${sessionId}/resume`, {
     method: 'POST',
     headers: {

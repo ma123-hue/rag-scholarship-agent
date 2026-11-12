@@ -14,6 +14,7 @@ const authStore = useAuthStore()
 const chatStore = useChatStore()
 const router = useRouter()
 const scrollContainer = ref(null)
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 const messages = computed(() => chatStore.activeMessages)
 const suggestionPrompts = [
@@ -123,7 +124,11 @@ onMounted(() => {
       @logout="handleLogout"
     />
 
-    <main class="chat-main">
+    <main class="chat-main" :class="{ 'demo-layout': demoMode }">
+      <div v-if="demoMode" class="demo-bar">
+        <strong>DEMO</strong>
+        <span>交互与 Agent 轨迹为预设产品演示｜数据仅保存在当前浏览器</span>
+      </div>
       <header class="chat-header">
         <div class="chat-header-main">
           <p class="chat-kicker">Scholarship Application Agent</p>

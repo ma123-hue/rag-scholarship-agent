@@ -19,6 +19,7 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['approval'])
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 const score = computed(() => {
   const match = props.message.content.match(/资格匹配度：\s*(\d{1,3})%/)
@@ -204,7 +205,7 @@ async function handleApproval(type) {
           class="export-btn"
           @click="handleExportDocx"
         >
-          📄 转成文档编辑
+          {{ demoMode ? '📄 下载演示报告' : '📄 转成文档编辑' }}
         </button>
       </div>
     </div>

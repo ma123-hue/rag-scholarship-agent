@@ -11,6 +11,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const activeTab = ref('login')
 const loading = ref(false)
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 const loginForm = reactive({
   username: '',
@@ -49,6 +50,12 @@ async function handleRegister() {
     loading.value = false
   }
 }
+
+async function enterDemo() {
+  loginForm.username = '招聘体验官'
+  loginForm.password = 'demo-only'
+  await handleLogin()
+}
 </script>
 
 <template>
@@ -68,6 +75,17 @@ async function handleRegister() {
         <el-icon><UserFilled /></el-icon>
         <span>账户入口</span>
       </div>
+
+      <div v-if="demoMode" class="demo-notice">
+        <strong>免费产品演示</strong>
+        <span>预设案例在浏览器本地运行，不调用模型、不上传数据。</span>
+      </div>
+
+      <el-button v-if="demoMode" class="demo-entry" type="primary" round @click="enterDemo">
+        一键进入演示
+      </el-button>
+
+      <div v-if="demoMode" class="demo-divider"><span>或体验账户流程</span></div>
 
       <el-tabs v-model="activeTab" stretch>
         <el-tab-pane label="登录" name="login">

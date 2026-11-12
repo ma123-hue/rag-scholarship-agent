@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 const apiTarget = process.env.VITE_API_PROXY_TARGET || 'http://localhost:8000'
 
 export default defineConfig({
+  base: process.env.VITE_DEMO_MODE === 'true' ? '/rag-scholarship-agent/' : '/',
   plugins: [vue()],
   server: {
     port: 5173,
