@@ -1,6 +1,7 @@
 import { buildRuleTrace, evaluateMessage } from '../demo/ruleEngine'
 
-const STORAGE_KEY = 'scholar_demo_state_v1'
+// 规则引擎版使用独立存储，避免旧版预设答案继续出现在历史会话中。
+const STORAGE_KEY = 'scholar_demo_state_v2'
 
 const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
