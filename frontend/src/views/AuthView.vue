@@ -78,7 +78,7 @@ async function enterDemo() {
 
       <div v-if="demoMode" class="demo-notice">
         <strong>免费产品演示</strong>
-        <span>预设案例在浏览器本地运行，不调用模型、不上传数据。</span>
+        <span>真实政策规则在浏览器本地计算，不调用模型、不上传数据。</span>
       </div>
 
       <el-button v-if="demoMode" class="demo-entry" type="primary" round @click="enterDemo">

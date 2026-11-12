@@ -18,9 +18,9 @@ const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 const messages = computed(() => chatStore.activeMessages)
 const suggestionPrompts = [
-  '我是大二计算机专业，绩点 3.82/4.0，专业排名前 8%，请先告诉我还需要补充哪些信息才能评估奖学金资格。',
-  '我家庭年收入 2 万元，有贫困证明，综测前 20%，请评估我可能符合哪些助学金。',
-  '我获得过校级三好学生和竞赛奖项，想申请国家奖学金，请按政策条款逐项比对。',
+  '我是中国籍大二全日制本科生，专业排名前8%，综测排名前9%，无挂科无处分，已按时注册，诚实守信，有国家级竞赛获奖，请评估国家奖学金。',
+  '我是大三全日制本科生，有贫困证明，专业排名前30%，综测前10%，无挂科，请评估国家励志奖学金。',
+  '我是软件学院大二全日制本科生，专业排名前18%，获得3项优秀个人荣誉称号，无挂科无处分，三项成绩合格，已按时注册，成绩记录完整，请评估一等奖学金。',
 ]
 
 const latestCompletedAssistantMessage = computed(() => {
@@ -126,15 +126,17 @@ onMounted(() => {
 
     <main class="chat-main" :class="{ 'demo-layout': demoMode }">
       <div v-if="demoMode" class="demo-bar">
-        <strong>DEMO</strong>
-        <span>交互与 Agent 轨迹为预设产品演示｜数据仅保存在当前浏览器</span>
+        <strong>RULE ENGINE</strong>
+        <span>基于仓库内真实政策条款确定性计算｜未知信息不会自动推断</span>
       </div>
       <header class="chat-header">
         <div class="chat-header-main">
           <p class="chat-kicker">Scholarship Application Agent</p>
           <h2>奖助学金申请评估智能体</h2>
           <p class="chat-subcopy">
-            输入你的目标与条件，Agent 会自主规划、调用政策与评估工具，并展示可核对的执行过程。
+            {{ demoMode
+              ? '输入明确条件，本地规则引擎会逐项核验政策，并展示满足、不满足和信息缺失。'
+              : '输入你的目标与条件，Agent 会自主规划、调用政策与评估工具，并展示可核对的执行过程。' }}
           </p>
         </div>
         <div class="chat-header-status">
@@ -147,7 +149,7 @@ onMounted(() => {
         <div class="message-stack">
           <div v-if="messages.length === 0" class="empty-state">
             <span class="empty-badge">开始评估</span>
-            <h3>先把你的关键条件说清楚，再让模型判断是否符合政策。</h3>
+            <h3>先把关键条件说清楚，再由政策规则逐项判断。</h3>
             <p>
               推荐至少提供：专业、年级、绩点、专业排名、综测、家庭收入、贫困认定、获奖情况、是否有违纪记录。
             </p>
